@@ -26,11 +26,11 @@ app.use(session({
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes (will be added later)
-// app.use('/api/templates', require('./src/routes/template.routes'));
-// app.use('/api/boxes', require('./src/routes/box.routes'));
-// app.use('/api/mappings', require('./src/routes/mapping.routes'));
-// app.use('/api/export', require('./src/routes/export.routes'));
+// API Routes
+app.use('/api/templates', require('./src/routes/template.routes'));
+app.use('/api/boxes', require('./src/routes/box.routes'));
+app.use('/api/mappings', require('./src/routes/mapping.routes'));
+app.use('/api/export', require('./src/routes/export.routes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
