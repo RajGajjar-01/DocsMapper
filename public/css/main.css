@@ -1,0 +1,146 @@
+/* Custom CSS for DocsMapper */
+
+/* Pastel color variables for field mappings */
+:root {
+    --color-lavender-bg: #E6E6FA;
+    --color-lavender-border: #9370DB;
+    --color-mint-bg: #F0FFF0;
+    --color-mint-border: #98FB98;
+    --color-peach-bg: #FFE5CC;
+    --color-peach-border: #FFB347;
+    --color-sky-bg: #E0F4FF;
+    --color-sky-border: #87CEEB;
+    --color-rose-bg: #FFE4E1;
+    --color-rose-border: #FFB6C1;
+    --color-lemon-bg: #FFFACD;
+    --color-lemon-border: #F0E68C;
+    --color-aqua-bg: #E0FFFF;
+    --color-aqua-border: #7FFFD4;
+    --color-coral-bg: #FFF0F5;
+    --color-coral-border: #FF7F50;
+    --color-lilac-bg: #F5F0FF;
+    --color-lilac-border: #DDA0DD;
+    --color-sage-bg: #F0F8E8;
+    --color-sage-border: #8FBC8F;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease;
+}
+
+/* Bounding box styles */
+.bounding-box {
+    position: absolute;
+    border: 2px solid #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+    cursor: move;
+}
+
+.bounding-box:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.box-id-label {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    background: #3b82f6;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Field color classes */
+.field-lavender {
+    background-color: var(--color-lavender-bg);
+    border-color: var(--color-lavender-border);
+}
+
+.field-mint {
+    background-color: var(--color-mint-bg);
+    border-color: var(--color-mint-border);
+}
+
+.field-peach {
+    background-color: var(--color-peach-bg);
+    border-color: var(--color-peach-border);
+}
+
+.field-sky {
+    background-color: var(--color-sky-bg);
+    border-color: var(--color-sky-border);
+}
+
+.field-rose {
+    background-color: var(--color-rose-bg);
+    border-color: var(--color-rose-border);
+}
+
+.field-lemon {
+    background-color: var(--color-lemon-bg);
+    border-color: var(--color-lemon-border);
+}
+
+.field-aqua {
+    background-color: var(--color-aqua-bg);
+    border-color: var(--color-aqua-border);
+}
+
+.field-coral {
+    background-color: var(--color-coral-bg);
+    border-color: var(--color-coral-border);
+}
+
+.field-lilac {
+    background-color: var(--color-lilac-bg);
+    border-color: var(--color-lilac-border);
+}
+
+.field-sage {
+    background-color: var(--color-sage-bg);
+    border-color: var(--color-sage-border);
+}
+
+/* PDF canvas container */
+.pdf-canvas-container {
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modal overlay */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+/* Hover lift effect (shadcn-style) */
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus ring (accessibility) */
+.focus-ring:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}

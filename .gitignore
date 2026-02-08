@@ -1,0 +1,67 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Temporary files
+temp/
+*.tmp
+*.temp
+
+# Database files
+database/*.db
+database/*.db-shm
+database/*.db-wal
+*.sqlite
+*.sqlite3
+
+# Build outputs
+dist/
+build/
+public/dist/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Reference folders (keep for now, will delete later)
+PDF/
+resources/
+
+# Generated files
+*.pdf
+*.docx
+!templates/*.pdf
+
+# Session storage
+sessions/
+
+# Coverage and test files
+coverage/
+.nyc_output/
+*.coverage
+
+# Misc
+.cache/
+.parcel-cache/
