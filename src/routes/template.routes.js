@@ -9,6 +9,9 @@ router.post('/upload', upload.single('pdf'), templateController.uploadTemplate);
 // Get template by ID
 router.get('/:id', templateController.getTemplate);
 
+// Serve PDF file for viewing
+router.get('/:id/pdf', templateController.servePDF);
+
 // Get template from session
 router.get('/session/current', templateController.getSessionTemplate);
 

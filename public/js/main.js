@@ -1,36 +1,37 @@
-// Main JavaScript entry point
-console.log('DocsMapper initialized');
-
 // Upload form handler
-document.addEventListener('DOMContentLoaded', () => {
-    const uploadForm = document.getElementById('uploadForm');
+const uploadForm = document.getElementById('upload-form');
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const formData = new FormData();
+        const fileInput = document.getElementById('pdf-file');
+        const file = fileInput.files[0];
 
-            const formData = new FormData(uploadForm);
+        if (!file) {
+            alert('Please select a PDF file');
+            return;
+        }
 
-            try {
-                const response = await fetch('/api/templates/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+        formData.append('pdf', file);
 
-                if (!response.ok) {
-                    throw new Error('Upload failed');
-                }
+        try {
+            const response = await fetch('/api/templates/upload', {
+                method: 'POST',
+                body: formData
+            });
 
-                const data = await response.json();
-                console.log('Upload successful:', data);
+            const data = await response.json();
 
-                // Redirect to box creation page
+            if (data.success) {
+                // Redirect to box creator page
                 window.location.href = `/pages/create-boxes.html?templateId=${data.templateId}`;
-
-            } catch (error) {
-                console.error('Error uploading PDF:', error);
-                alert('Failed to upload PDF. Please try again.');
+            } else {
+                alert('Upload failed: ' + data.error);
             }
-        });
-    }
-});
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Upload failed: ' + error.message);
+        }
+    });
+}

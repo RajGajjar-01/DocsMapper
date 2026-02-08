@@ -104,6 +104,38 @@ exports.getSessionTemplate = async (req, res) => {
 };
 
 /**
+ * Serve PDF file for viewing
+ * GET /api/templates/:id/pdf
+ */
+exports.servePDF = async (req, res) => {
+    try {
+        const templateId = parseInt(req.params.id);
+        const template = await Template.findById(templateId);
+
+        if (!template) {
+            return res.status(404).json({ error: 'Template not found' });
+        }
+
+        // Check if file exists
+        const fs = require('fs');
+        if (!fs.existsSync(template.file_path)) {
+            return res.status(404).json({ error: 'PDF file not found' });
+        }
+
+        // Send PDF file
+        res.setHeader('Content-Type', 'application/pdf');
+        res.sendFile(template.file_path, { root: '/' });
+
+    } catch (error) {
+        console.error('Serve PDF error:', error);
+        res.status(500).json({
+            error: 'Failed to serve PDF',
+            message: error.message
+        });
+    }
+};
+
+/**
  * Delete template
  * DELETE /api/templates/:id
  */

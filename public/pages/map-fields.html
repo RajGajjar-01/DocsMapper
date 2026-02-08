@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Fields - DocsMapper</title>
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b sticky top-0 z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Map Fields to Boxes</h1>
+                        <p class="text-sm text-gray-600">Select boxes and assign them to form fields</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span id="field-count"
+                            class="px-3 py-1 bg-green-100 text-green-700 rounded-md text-sm font-medium">
+                            0 fields
+                        </span>
+                        <button id="create-field-btn"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:opacity-50"
+                            disabled>
+                            Create Field
+                        </button>
+                        <button id="finish-mapping-btn"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium disabled:opacity-50"
+                            disabled>
+                            Finish & Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex">
+            <!-- Sidebar - Fields List -->
+            <aside class="w-80 bg-white border-r p-4 overflow-y-auto">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Created Fields</h3>
+                        <div id="fields-list" class="space-y-2 text-sm">
+                            <p class="text-gray-500 text-center py-4">No fields created yet</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Instructions</h3>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li>• Click boxes to select (green border)</li>
+                            <li>• Select multiple boxes for one field</li>
+                            <li>• Click "Create Field" button</li>
+                            <li>• Fill in field details in modal</li>
+                            <li>• Each field gets a unique color</li>
+                            <li>• Click "Finish" when done</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Selected Boxes</h3>
+                        <div id="selected-boxes-list" class="text-xs text-gray-600">
+                            <p class="text-gray-500">No boxes selected</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- PDF Canvas Area -->
+            <div class="flex-1 overflow-auto p-6 bg-gray-100">
+                <div class="flex gap-4 mb-4">
+                    <button id="prev-page" class="px-3 py-1 bg-white border rounded hover:bg-gray-50" disabled>←
+                        Previous</button>
+                    <span id="page-info" class="px-3 py-1 bg-white border rounded">Page 1 / 1</span>
+                    <button id="next-page" class="px-3 py-1 bg-white border rounded hover:bg-gray-50" disabled>Next
+                        →</button>
+                    <input type="range" id="zoom-slider" min="0.5" max="2" step="0.1" value="1" class="flex-1 max-w-xs">
+                    <span id="zoom-level" class="text-sm">100%</span>
+                </div>
+
+                <div id="loading" class="flex items-center justify-center h-96">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-gray-600">Loading boxes...</span>
+                </div>
+
+                <div id="pdf-container" class="hidden relative inline-block">
+                    <canvas id="pdf-canvas" class="border shadow-lg"></canvas>
+                    <div id="boxes-overlay" class="absolute top-0 left-0"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Field Creation Modal -->
+    <div id="field-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Create Form Field</h2>
+
+            <form id="field-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Field Name *</label>
+                        <input type="text" id="field-name" required class="form-input" placeholder="e.g., firstName">
+                        <p class="text-xs text-gray-500 mt-1">Unique identifier (no spaces)</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Field Label *</label>
+                        <input type="text" id="field-label" required class="form-input" placeholder="e.g., First Name">
+                        <p class="text-xs text-gray-500 mt-1">Display name for the form</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Field Type</label>
+                        <select id="field-type" class="form-input">
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="email">Email</option>
+                            <option value="date">Date</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Font Size</label>
+                        <input type="number" id="field-font-size" value="10" min="6" max="20" class="form-input">
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                        <p class="text-sm text-blue-900">
+                            <strong>Selected Boxes:</strong> <span id="modal-box-count">0</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mt-6">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Create Field
+                    </button>
+                    <button type="button" id="cancel-modal"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Field Mapper JavaScript -->
+    <script src="/js/field-mapper.js"></script>
+</body>
+
+</html>

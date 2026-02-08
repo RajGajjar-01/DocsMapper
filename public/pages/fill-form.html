@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill Form - DocsMapper</title>
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b sticky top-0 z-10">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold text-gray-900">Fill Your Form</h1>
+                    <p class="text-sm text-gray-600">Enter your data and export to PDF or DOCX</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Form Content -->
+        <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div id="loading" class="flex items-center justify-center py-12">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-gray-600">Loading form...</span>
+                </div>
+
+                <!-- Dynamic Form -->
+                <form id="dynamic-form" class="hidden space-y-6">
+                    <div id="form-fields"></div>
+
+                    <!-- Export Buttons -->
+                    <div class="border-t pt-6 space-y-3">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Export Options</h3>
+
+                        <button type="button" id="export-pdf-btn"
+                            class="w-full px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Export as PDF
+                        </button>
+
+                        <button type="button" id="export-docx-btn"
+                            class="w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Export as DOCX
+                        </button>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-900">
+                            <strong>💡 Tip:</strong> For Google Docs, export as DOCX, then upload to Google Drive and
+                            open with Google Docs.
+                        </div>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button type="button" id="reset-form-btn"
+                        class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium">
+                        Reset Form
+                    </button>
+
+                    <!-- Back Button -->
+                    <a href="/" class="block text-center text-sm text-blue-600 hover:text-blue-800">
+                        ← Start New Document
+                    </a>
+                </form>
+            </div>
+
+            <!-- Field Mappings Info -->
+            <div class="mt-6 bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-semibold text-gray-900 mb-2">Field Mappings</h3>
+                <div id="mappings-info" class="space-y-2 text-sm">
+                    <p class="text-gray-500">Loading mappings...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Export Progress Modal -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content text-center">
+            <div class="spinner mx-auto"></div>
+            <h3 class="text-lg font-semibold mt-4">Generating Document...</h3>
+            <p class="text-sm text-gray-600 mt-2">This may take a few moments</p>
+        </div>
+    </div>
+
+    <!-- Form Builder JavaScript -->
+    <script src="/js/form-builder.js"></script>
+</body>
+
+</html>
