@@ -1,5 +1,5 @@
 // Upload form handler
-const uploadForm = document.getElementById('upload-form');
+const uploadForm = document.getElementById('uploadForm');
 if (uploadForm) {
     uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();

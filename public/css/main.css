@@ -166,15 +166,56 @@ body {
 /* Box ID Label */
 .box-id-label {
     position: absolute;
-    top: -20px;
+    top: -26px;
     left: 0;
-    background: var(--pastel-blue);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: bold;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: move;
+    user-select: none;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.box-id-label:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+/* Delete Button */
+.box-delete-btn {
+    position: absolute;
+    top: -26px;
+    right: 0;
+    background: #ef4444;
+    color: white;
+    border: 2px solid white;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    z-index: 10;
+    padding: 0;
+}
+
+.box-delete-btn:hover {
+    background: #dc2626;
+    transform: scale(1.15);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
+}
+
+.box-delete-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
 /* Loading Spinner */

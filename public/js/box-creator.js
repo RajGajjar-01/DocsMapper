@@ -14,12 +14,16 @@ if (!templateId) {
 let pdfDoc = null;
 let currentPage = 1;
 let totalPages = 0;
-let scale = 1.0;
+let scale = 0.8;
 let boxes = []; // { page, x, y, w, h }
 let isDrawing = false;
 let startX = 0;
 let startY = 0;
 let currentBox = null;
+let isDragging = false;
+let draggedBoxIndex = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
 // DOM elements
 const canvas = document.getElementById('pdf-canvas');
@@ -53,6 +57,7 @@ async function init() {
 
         // Update UI
         document.getElementById('page-info').textContent = `${currentPage} / ${totalPages}`;
+        document.getElementById('zoom-level').textContent = Math.round(scale * 100) + '%';
 
         // Enable/disable navigation buttons
         updateNavButtons();
@@ -105,31 +110,45 @@ function renderBoxes() {
     const pageBoxes = boxes.filter(b => b.page === currentPage);
 
     pageBoxes.forEach((box, index) => {
+        const globalIndex = boxes.indexOf(box);
+        
+        // The box itself
         const boxDiv = document.createElement('div');
         boxDiv.className = 'bounding-box';
+        boxDiv.style.position = 'absolute';
         boxDiv.style.left = box.x * scale + 'px';
         boxDiv.style.top = box.y * scale + 'px';
         boxDiv.style.width = box.w * scale + 'px';
         boxDiv.style.height = box.h * scale + 'px';
+        boxDiv.dataset.boxIndex = globalIndex;
 
-        // Add box ID label
+        // Add box ID label (draggable handle) - outside and above the box
         const label = document.createElement('div');
         label.className = 'box-id-label';
-        label.textContent = `#${boxes.indexOf(box) + 1}`;
+        label.textContent = `#${globalIndex + 1}`;
+        label.dataset.boxIndex = globalIndex;
+        label.style.cursor = 'move';
+        label.addEventListener('mousedown', handleBoxDragStart);
         boxDiv.appendChild(label);
-
-        // Delete button
+        
+        // Delete button (top right, outside the box)
         const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded';
-        deleteBtn.textContent = '×';
+        deleteBtn.className = 'box-delete-btn';
+        deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+        deleteBtn.title = 'Delete box';
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
-            deleteBox(boxes.indexOf(box));
+            deleteBox(globalIndex);
         };
         boxDiv.appendChild(deleteBtn);
-
+        
         boxesOverlay.appendChild(boxDiv);
     });
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 // Setup event listeners
@@ -158,10 +177,31 @@ function setupEventListeners() {
         await renderPage(currentPage);
     });
 
+    // Box height change handler
+    document.getElementById('box-height').addEventListener('input', (e) => {
+        const newHeight = parseInt(e.target.value);
+        const updatePrevious = document.getElementById('update-previous-boxes').checked;
+
+        if (updatePrevious && boxes.length > 0) {
+            // Update height of all existing boxes
+            boxes.forEach(box => {
+                box.h = newHeight;
+            });
+
+            // Re-render boxes with new height
+            renderBoxes();
+            updateBoxesList();
+        }
+    });
+
     // Mouse events for drawing boxes
     boxesOverlay.addEventListener('mousedown', handleMouseDown);
     boxesOverlay.addEventListener('mousemove', handleMouseMove);
     boxesOverlay.addEventListener('mouseup', handleMouseUp);
+    
+    // Mouse events for dragging boxes
+    document.addEventListener('mousemove', handleBoxDragMove);
+    document.addEventListener('mouseup', handleBoxDragEnd);
 
     // Save boxes
     document.getElementById('save-boxes-btn').addEventListener('click', saveBoxes);
@@ -169,6 +209,13 @@ function setupEventListeners() {
 
 // Handle mouse down - start drawing
 function handleMouseDown(e) {
+    // Don't start drawing if clicking on a box or its label
+    if (e.target.classList.contains('box-id-label') || 
+        e.target.classList.contains('bounding-box') ||
+        e.target.classList.contains('box-delete-btn')) {
+        return;
+    }
+    
     isDrawing = true;
     const rect = boxesOverlay.getBoundingClientRect();
     startX = (e.clientX - rect.left) / scale;
@@ -177,6 +224,7 @@ function handleMouseDown(e) {
     // Create temporary box element
     currentBox = document.createElement('div');
     currentBox.className = 'bounding-box';
+    currentBox.style.position = 'absolute';
     currentBox.style.left = e.clientX - rect.left + 'px';
     currentBox.style.top = e.clientY - rect.top + 'px';
     currentBox.style.width = '0px';
@@ -233,10 +281,53 @@ function handleMouseUp(e) {
 
 // Delete box
 function deleteBox(index) {
-    boxes.splice(index, 1);
+    if (confirm(`Delete Box #${index + 1}?`)) {
+        boxes.splice(index, 1);
+        renderBoxes();
+        updateBoxCount();
+        updateBoxesList();
+    }
+}
+
+// Handle box drag start (only from label)
+function handleBoxDragStart(e) {
+    e.stopPropagation();
+    isDragging = true;
+    draggedBoxIndex = parseInt(e.target.dataset.boxIndex);
+    
+    const box = boxes[draggedBoxIndex];
+    const rect = boxesOverlay.getBoundingClientRect();
+    
+    dragOffsetX = e.clientX - rect.left - (box.x * scale);
+    dragOffsetY = e.clientY - rect.top - (box.y * scale);
+    
+    // Prevent text selection while dragging
+    e.preventDefault();
+}
+
+// Handle box drag move
+function handleBoxDragMove(e) {
+    if (!isDragging || draggedBoxIndex === null) return;
+    
+    const rect = boxesOverlay.getBoundingClientRect();
+    const newX = (e.clientX - rect.left - dragOffsetX) / scale;
+    const newY = (e.clientY - rect.top - dragOffsetY) / scale;
+    
+    // Update box position
+    boxes[draggedBoxIndex].x = Math.max(0, newX);
+    boxes[draggedBoxIndex].y = Math.max(0, newY);
+    
+    // Re-render
     renderBoxes();
-    updateBoxCount();
-    updateBoxesList();
+}
+
+// Handle box drag end
+function handleBoxDragEnd(e) {
+    if (isDragging) {
+        isDragging = false;
+        draggedBoxIndex = null;
+        updateBoxesList();
+    }
 }
 
 // Update box count display
